@@ -1,5 +1,6 @@
 import express from 'express';
 import { env } from './config/env';
+import routes from './routes';
 
 const app = express();
 
@@ -7,9 +8,7 @@ const app = express();
 app.use(express.json());
 
 // Rota de teste
-app.get('/', (req, res) => {
-  res.send('Bet-Hub API está rodando!');
-});
+app.use('/api', routes);
 
 // Inicializa o servidor
 app.listen(env.PORT, () => {
