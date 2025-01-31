@@ -13,6 +13,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@types/axios": "^0.9.36",
+    "axios": "^1.7.9",
     "backend": "file:",
     "dotenv": "^16.4.7",
     "express": "^4.21.2"
