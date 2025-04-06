@@ -6,7 +6,8 @@
     "dev": "nodemon",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "pretest": "prisma generate",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -22,9 +23,13 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.14",
     "@types/node": "^22.10.10",
+    "@types/supertest": "^6.0.3",
     "nodemon": "^3.1.9",
     "prisma": "^6.3.0",
+    "supertest": "^7.1.0",
+    "ts-jest": "^29.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
   }
