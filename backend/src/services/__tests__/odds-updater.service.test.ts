@@ -4,6 +4,10 @@ import OddsUpdaterService from '../odds-updater.service';
 import SportsService from '../sports.service';
 import cron from 'node-cron';
 
+// Mock console methods to reduce noise in tests
+const originalConsoleLog = console.log;
+const originalConsoleError = console.error;
+
 // Mock do PrismaClient
 jest.mock('@prisma/client', () => {
   const mockPrismaClient = {
@@ -18,27 +22,48 @@ jest.mock('@prisma/client', () => {
 // Mock do SportsService
 jest.mock('../sports.service');
 
+// Define the stop mock function that we can access later
+const stopMock = jest.fn();
+
 // Mock do node-cron
 jest.mock('node-cron', () => ({
   schedule: jest.fn(() => ({
-    stop: jest.fn(),
+    stop: stopMock,
   })),
   validate: jest.fn().mockReturnValue(true),
 }));
 
-// Mock do cron-parser (usado em getNextRunTime)
-jest.mock('cron-parser', () => ({
-  parseExpression: jest.fn(() => ({
-    next: jest.fn(() => ({ toDate: jest.fn(() => new Date()) })),
-  })),
-}));
+// Em vez de mockar o cron-parser, vamos mockar o método getNextRunTime
+jest.spyOn(OddsUpdaterService as any, 'getNextRunTime').mockReturnValue('próxima execução simulada');
 
 const prisma = new PrismaClient();
 const mockBetFindMany = prisma.bet.findMany as jest.Mock;
 
 describe('OddsUpdaterService', () => {
   beforeEach(() => {
+    // Silence console output during tests
+    console.log = jest.fn();
+    console.error = jest.fn();
+    
     jest.clearAllMocks();
+    // Reset isRunning state before each test
+    (OddsUpdaterService as any).isRunning = false;
+    // Reset the cronJob property as well
+    (OddsUpdaterService as any).cronJob = null;
+  });
+
+  afterEach(() => {
+    // Restore console functions after each test
+    console.log = originalConsoleLog;
+    console.error = originalConsoleError;
+  });
+
+  // Add cleanup after all tests
+  afterAll(() => {
+    // Ensure any cron jobs are stopped
+    if ((OddsUpdaterService as any).cronJob) {
+      OddsUpdaterService.stopUpdater();
+    }
   });
 
   describe('startUpdater', () => {
@@ -55,17 +80,13 @@ describe('OddsUpdaterService', () => {
     });
 
     it('should stop existing job before creating a new one', () => {
-      // Configurar um job inicial
+      // Set up the cronJob property manually to simulate an existing job
+      (OddsUpdaterService as any).cronJob = { stop: stopMock };
+      
+      // Start a new job
       OddsUpdaterService.startUpdater();
       
-      // Mock de stop
-      const stopMock = jest.fn();
-      (cron.schedule as jest.Mock).mockReturnValueOnce({ stop: stopMock });
-      
-      // Iniciar novo job
-      OddsUpdaterService.startUpdater();
-      
-      // Verificar que o job anterior foi parado
+      // Verify that stop was called on the existing job
       expect(stopMock).toHaveBeenCalled();
     });
   });
@@ -149,6 +170,9 @@ describe('OddsUpdaterService', () => {
     });
 
     it('should handle errors gracefully', async () => {
+      // Explicitly set isRunning to false before the test
+      (OddsUpdaterService as any).isRunning = false;
+      
       // Simulando um erro ao obter esportes
       (SportsService.getAllSports as jest.Mock).mockRejectedValue(new Error('API Error'));
       

@@ -45,6 +45,7 @@ class SportsController {
       
       if (!event) {
         res.status(404).json({ error: 'Evento não encontrado' });
+        return; // Adicionar este return para evitar enviar uma segunda resposta
       }
       
       res.json(event);

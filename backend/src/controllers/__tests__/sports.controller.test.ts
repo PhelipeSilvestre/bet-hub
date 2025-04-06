@@ -14,10 +14,12 @@ describe('SportsController', () => {
   let mockResponse: Partial<Response>;
   let jsonMock: jest.Mock;
   let statusMock: jest.Mock;
+  let sendMock: jest.Mock;
 
   beforeEach(() => {
     jsonMock = jest.fn();
-    statusMock = jest.fn(() => ({ json: jsonMock }));
+    sendMock = jest.fn();
+    statusMock = jest.fn(() => ({ json: jsonMock, send: sendMock }));
     mockRequest = {
       params: {},
       query: {},
@@ -25,6 +27,7 @@ describe('SportsController', () => {
     mockResponse = {
       status: statusMock,
       json: jsonMock,
+      send: sendMock,
     };
     jest.clearAllMocks();
   });
@@ -46,10 +49,14 @@ describe('SportsController', () => {
 
     it('should use the region from query params if provided', async () => {
       mockRequest.query = { region: 'eu' };
+      const mockSports = [{ key: 'soccer' }]; // Adicionar um valor de retorno
+      
+      (SportsService.getAllSports as jest.Mock).mockResolvedValue(mockSports);
       
       await SportsController.getAllSports(mockRequest as Request, mockResponse as Response);
 
       expect(SportsService.getAllSports).toHaveBeenCalledWith('eu');
+      expect(jsonMock).toHaveBeenCalledWith(mockSports);
     });
 
     it('should handle errors and return 500', async () => {
@@ -89,6 +96,7 @@ describe('SportsController', () => {
 
       expect(SportsService.getEvent).toHaveBeenCalledWith('soccer', 'event1', 'us', 'h2h');
       expect(jsonMock).toHaveBeenCalledWith(mockEvent);
+      expect(statusMock).not.toHaveBeenCalled(); // Não deve chamar status se sucesso
     });
 
     it('should return 404 if event is not found', async () => {
@@ -99,6 +107,7 @@ describe('SportsController', () => {
 
       expect(statusMock).toHaveBeenCalledWith(404);
       expect(jsonMock).toHaveBeenCalledWith({ error: 'Evento não encontrado' });
+      expect(jsonMock).toHaveBeenCalledTimes(1); // Deve chamar json apenas uma vez
     });
   });
 
@@ -151,7 +160,7 @@ describe('SportsController', () => {
     });
 
     it('should handle errors and return 500', async () => {
-      (SportsService.getUpcomingMatches as jest.Mock).mockRejectedValue(new Error());
+      (SportsService.getUpcomingMatches as jest.Mock).mockRejectedValue(new Error('API Error'));
 
       await SportsController.getUpcomingMatches(mockRequest as Request, mockResponse as Response);
 

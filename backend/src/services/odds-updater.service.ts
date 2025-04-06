@@ -45,6 +45,12 @@ class OddsUpdaterService {
     }
   }
 
+  // Add this method to ensure cleanup for testing
+  static cleanup() {
+    this.stopUpdater();
+    this.isRunning = false;
+  }
+
   /**
    * Atualiza as odds de todos os eventos ativos
    */
@@ -114,6 +120,14 @@ class OddsUpdaterService {
       return 'horário desconhecido';
     }
   }
+}
+
+// Add this for test environments to ensure cleanup
+if (process.env.NODE_ENV === 'test') {
+  // Ensure cleanup before process exits
+  process.on('beforeExit', () => {
+    OddsUpdaterService.cleanup();
+  });
 }
 
 export default OddsUpdaterService;

@@ -1,25 +1,29 @@
+// Import types only, not implementations
+
+
+// Set up mock module factories
+const mockPrismaClient = {
+  user: {
+    findUnique: jest.fn(),
+    update: jest.fn(),
+  },
+  bet: {
+    create: jest.fn(),
+    findMany: jest.fn(),
+    findUnique: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+  },
+};
+
+// Mock the PrismaClient module
+jest.mock('@prisma/client', () => ({
+  PrismaClient: jest.fn(() => mockPrismaClient)
+}));
+
+// Now import the service (after mocks are set up)
+// This breaks the circular dependency
 import BetService from '../bet.service';
-import { PrismaClient } from '@prisma/client';
-
-// Mock do Prisma Client
-jest.mock('@prisma/client', () => {
-  const mockPrismaClient = {
-    user: {
-      findUnique: jest.fn(),
-      update: jest.fn(),
-    },
-    bet: {
-      create: jest.fn(),
-      findMany: jest.fn(),
-      findUnique: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-    },
-  };
-  return { PrismaClient: jest.fn(() => mockPrismaClient) };
-});
-
-const prismaMock = new PrismaClient() as jest.Mocked<PrismaClient>;
 
 describe('BetService', () => {
   beforeEach(() => {
@@ -28,12 +32,12 @@ describe('BetService', () => {
 
   describe('createBet', () => {
     it('should create a bet and deduct the user balance', async () => {
-      prismaMock.user.findUnique.mockResolvedValue({
+      mockPrismaClient.user.findUnique.mockResolvedValue({
         id: 'user1',
         balance: 100,
-      } as unknown);
+      });
 
-      prismaMock.bet.create.mockResolvedValue({
+      mockPrismaClient.bet.create.mockResolvedValue({
         id: 'bet1',
         userId: 'user1',
         eventId: 'event1',
@@ -42,17 +46,17 @@ describe('BetService', () => {
         potentialPayout: 100,
         sport: 'football',
         status: 'PENDING',
-      } as unknown);
+      });
 
-      prismaMock.user.update.mockResolvedValue({
+      mockPrismaClient.user.update.mockResolvedValue({
         id: 'user1',
         balance: 50,
-      } as unknown);
+      });
 
       const bet = await BetService.createBet('user1', 'event1', 50, 2.0, 'football');
 
-      expect(prismaMock.user.findUnique).toHaveBeenCalledWith({ where: { id: 'user1' } });
-      expect(prismaMock.bet.create).toHaveBeenCalledWith({
+      expect(mockPrismaClient.user.findUnique).toHaveBeenCalledWith({ where: { id: 'user1' } });
+      expect(mockPrismaClient.bet.create).toHaveBeenCalledWith({
         data: {
           userId: 'user1',
           eventId: 'event1',
@@ -62,7 +66,7 @@ describe('BetService', () => {
           sport: 'football',
         },
       });
-      expect(prismaMock.user.update).toHaveBeenCalledWith({
+      expect(mockPrismaClient.user.update).toHaveBeenCalledWith({
         where: { id: 'user1' },
         data: { balance: 50 },
       });
@@ -70,7 +74,7 @@ describe('BetService', () => {
     });
 
     it('should throw an error if the user does not exist', async () => {
-      prismaMock.user.findUnique.mockResolvedValue(null);
+      mockPrismaClient.user.findUnique.mockResolvedValue(null);
 
       await expect(BetService.createBet('user1', 'event1', 50, 2.0, 'football')).rejects.toThrow(
         'Usuário não encontrado'
@@ -78,10 +82,10 @@ describe('BetService', () => {
     });
 
     it('should throw an error if the user has insufficient balance', async () => {
-      prismaMock.user.findUnique.mockResolvedValue({
+      mockPrismaClient.user.findUnique.mockResolvedValue({
         id: 'user1',
         balance: 30,
-      } as unknown);
+      });
 
       await expect(BetService.createBet('user1', 'event1', 50, 2.0, 'football')).rejects.toThrow(
         'Saldo insuficiente'
@@ -91,13 +95,13 @@ describe('BetService', () => {
 
   describe('getBetsByUser', () => {
     it('should return a list of bets for a user', async () => {
-      prismaMock.bet.findMany.mockResolvedValue([
-        { id: 'bet1', userId: 'user1', amount: 50 } as unknown,
+      mockPrismaClient.bet.findMany.mockResolvedValue([
+        { id: 'bet1', userId: 'user1', amount: 50 },
       ]);
 
       const bets = await BetService.getBetsByUser('user1');
 
-      expect(prismaMock.bet.findMany).toHaveBeenCalledWith({ where: { userId: 'user1' } });
+      expect(mockPrismaClient.bet.findMany).toHaveBeenCalledWith({ where: { userId: 'user1' } });
       expect(bets).toHaveLength(1);
       expect(bets[0]).toEqual(expect.objectContaining({ id: 'bet1', amount: 50 }));
     });
@@ -105,20 +109,20 @@ describe('BetService', () => {
 
   describe('getBetById', () => {
     it('should return a bet by its ID', async () => {
-      prismaMock.bet.findUnique.mockResolvedValue({
+      mockPrismaClient.bet.findUnique.mockResolvedValue({
         id: 'bet1',
         userId: 'user1',
         amount: 50,
-      } as unknown);
+      });
 
       const bet = await BetService.getBetById('bet1');
 
-      expect(prismaMock.bet.findUnique).toHaveBeenCalledWith({ where: { id: 'bet1' } });
+      expect(mockPrismaClient.bet.findUnique).toHaveBeenCalledWith({ where: { id: 'bet1' } });
       expect(bet).toEqual(expect.objectContaining({ id: 'bet1', amount: 50 }));
     });
 
     it('should return null if the bet does not exist', async () => {
-      prismaMock.bet.findUnique.mockResolvedValue(null);
+      mockPrismaClient.bet.findUnique.mockResolvedValue(null);
 
       const bet = await BetService.getBetById('bet1');
 
@@ -128,14 +132,14 @@ describe('BetService', () => {
 
   describe('updateBetStatus', () => {
     it('should update the status of a bet', async () => {
-      prismaMock.bet.update.mockResolvedValue({
+      mockPrismaClient.bet.update.mockResolvedValue({
         id: 'bet1',
         status: 'WON',
-      } as unknown);
+      });
 
       const bet = await BetService.updateBetStatus('bet1', 'WON');
 
-      expect(prismaMock.bet.update).toHaveBeenCalledWith({
+      expect(mockPrismaClient.bet.update).toHaveBeenCalledWith({
         where: { id: 'bet1' },
         data: { status: 'WON' },
       });
@@ -145,11 +149,11 @@ describe('BetService', () => {
 
   describe('deleteBet', () => {
     it('should delete a bet by its ID', async () => {
-      prismaMock.bet.delete.mockResolvedValue({ id: 'bet1' } as unknown);
+      mockPrismaClient.bet.delete.mockResolvedValue({ id: 'bet1' });
 
       const bet = await BetService.deleteBet('bet1');
 
-      expect(prismaMock.bet.delete).toHaveBeenCalledWith({ where: { id: 'bet1' } });
+      expect(mockPrismaClient.bet.delete).toHaveBeenCalledWith({ where: { id: 'bet1' } });
       expect(bet).toEqual(expect.objectContaining({ id: 'bet1' }));
     });
   });
