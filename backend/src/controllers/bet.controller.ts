@@ -4,7 +4,9 @@ import BetService from '../services/bet.service';
 class BetController {
   static async createBet(req: Request, res: Response) {
     try {
-      const { userId, eventId, amount, odds, sport } = req.body;
+      const { eventId, amount, odds, sport } = req.body;
+      const userId = req.userId!; // Usando o userId do token
+      
       const bet = await BetService.createBet(userId, eventId, amount, odds, sport);
       res.status(201).json(bet);
     } catch (error) {
@@ -14,7 +16,7 @@ class BetController {
 
   static async getBetsByUser(req: Request, res: Response) {
     try {
-      const { userId } = req.params;
+      const userId = req.userId!; // Usando o userId do token
       const bets = await BetService.getBetsByUser(userId);
       res.json(bets);
     } catch (error) {
