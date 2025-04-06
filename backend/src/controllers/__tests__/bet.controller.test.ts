@@ -13,7 +13,9 @@ describe('BetController', () => {
   beforeEach(() => {
     jsonMock = jest.fn();
     statusMock = jest.fn(() => ({ json: jsonMock }));
-    mockRequest = {};
+    mockRequest = {
+      userId: 'user1' // Importante: adicionar userId aqui para simular o que é adicionado pelo middleware
+    };
     mockResponse = {
       status: statusMock,
       json: jsonMock,
@@ -27,7 +29,6 @@ describe('BetController', () => {
       (BetService.createBet as jest.Mock).mockResolvedValue(mockBet);
 
       mockRequest.body = {
-        userId: 'user1',
         eventId: 'event1',
         amount: 50,
         odds: 2.0,
@@ -45,7 +46,6 @@ describe('BetController', () => {
       (BetService.createBet as jest.Mock).mockRejectedValue(new Error('Usuário não encontrado'));
 
       mockRequest.body = {
-        userId: 'user1',
         eventId: 'event1',
         amount: 50,
         odds: 2.0,
@@ -63,8 +63,6 @@ describe('BetController', () => {
     it('should return a list of bets for a user', async () => {
       const mockBets = [{ id: 'bet1', userId: 'user1', amount: 50 }];
       (BetService.getBetsByUser as jest.Mock).mockResolvedValue(mockBets);
-
-      mockRequest.params = { userId: 'user1' };
 
       await BetController.getBetsByUser(mockRequest as Request, mockResponse as Response);
 
