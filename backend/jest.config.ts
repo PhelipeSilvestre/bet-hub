@@ -3,5 +3,7 @@ export default {
   testEnvironment: 'node',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   forceExit: true, // Force exit after all tests are complete
-  detectOpenHandles: false, // Set to true to debug open handles
+  detectOpenHandles: true, // Enable this temporarily to identify the issue
+  // Add a timeout to give processes time to close
+  testTimeout: 15000,
 };
