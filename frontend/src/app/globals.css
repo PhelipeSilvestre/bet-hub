@@ -2,69 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --primary: #0070f3;
-  --primary-foreground: #ffffff;
-  --secondary: #6c18b5;
-  --secondary-foreground: #ffffff;
-  --muted: #f3f4f6;
-  --muted-foreground: #6b7280;
-  --accent: #f3f4f6;
-  --accent-foreground: #111827;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
-  --border: #e5e7eb;
-  --input: #e5e7eb;
-  --ring: #0070f3;
-  --radius: 0.5rem;
+html, body {
+  min-height: 100vh;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --primary: #0070f3;
-    --primary-foreground: #ffffff;
-    --secondary: #8623e0;
-    --secondary-foreground: #ffffff;
-    --muted: #1f1f1f;
-    --muted-foreground: #a1a1aa;
-    --accent: #2e2e2e;
-    --accent-foreground: #f9fafb;
-    --destructive: #ef4444;
-    --destructive-foreground: #ffffff;
-    --border: #27272a;
-    --input: #27272a;
-    --ring: #0070f3;
-  }
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: var(--font-geist-sans), Arial, sans-serif;
-}
-
-@layer base {
-  * {
-    @apply border-border;
+/* Componentes personalizados usando Tailwind */
+@layer components {
+  .bet-button {
+    @apply bg-bet-odd hover:bg-bet-oddHover text-white font-medium py-2 px-4 rounded-sm transition-colors;
   }
   
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-bold;
+  .bet-header {
+    @apply bg-bet-header text-white;
   }
   
-  h1 {
-    @apply text-3xl lg:text-4xl;
-  }
-  
-  h2 {
-    @apply text-2xl lg:text-3xl;
-  }
-  
-  h3 {
-    @apply text-xl lg:text-2xl;
+  .bet-card {
+    @apply bg-bet-card rounded-sm border border-bet-border;
   }
 }

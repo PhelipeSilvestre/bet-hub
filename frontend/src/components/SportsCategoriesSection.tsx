@@ -4,83 +4,105 @@ import React from 'react';
 import Link from 'next/link';
 
 // Categorias de esportes para exibição na página inicial
-const sportsCategories = [
-  { id: 'futebol', name: 'Futebol', icon: '⚽', competitions: ['brasileirao', 'champions', 'libertadores', 'premier-league'] },
-  { id: 'basquete', name: 'Basquete', icon: '🏀', competitions: ['nba', 'euroleague'] },
-  { id: 'tenis', name: 'Tênis', icon: '🎾', competitions: ['atp', 'wta', 'grand-slam'] },
-  { id: 'volei', name: 'Vôlei', icon: '🏐', competitions: ['superliga'] },
-  { id: 'formula1', name: 'Fórmula 1', icon: '🏎️', competitions: ['f1-mundial'] },
-  { id: 'mma', name: 'MMA', icon: '🥋', competitions: ['ufc', 'bellator'] },
+const sportsIcons = [
+  { id: 'futebol', name: 'Futebol', icon: '⚽' },
+  { id: 'tenis', name: 'Tênis', icon: '🎾' },
+  { id: 'formula1', name: 'F1', icon: '🏎️' },
+  { id: 'esports', name: 'E-Sports', icon: '🎮' },
+  { id: 'cassino', name: 'Cassino', icon: '🎰' },
+  { id: 'basquete', name: 'Basquete', icon: '🏀' },
+  { id: 'volei', name: 'Vôlei', icon: '🏐' },
+  { id: 'tenis-de-mesa', name: 'T. Mesa', icon: '🏓' },
+  { id: 'virtual', name: 'Virtual', icon: '🖥️' },
+  { id: 'futebol-americano', name: 'F. Americano', icon: '🏈' },
+  { id: 'beisebol', name: 'Beisebol', icon: '⚾' },
+  { id: 'boxe', name: 'Boxe', icon: '🥊' },
 ];
 
-// Banners para carrossel
-const banners = [
-  { id: 1, title: 'Bônus de Boas-vindas', description: 'Ganhe até R$200 no seu primeiro depósito', image: '/images/banner1.jpg', color: 'bg-gradient-to-r from-primary to-primary-600' },
-  { id: 2, title: 'Apostas sem Risco', description: 'Receba até R$100 de volta se perder', image: '/images/banner2.jpg', color: 'bg-gradient-to-r from-secondary to-secondary-600' },
-  { id: 3, title: 'Super Odds na Premier League', description: 'Odds aumentadas para os jogos do fim de semana', image: '/images/banner3.jpg', color: 'bg-gradient-to-r from-primary-600 to-secondary-600' },
+// Banners para destaque
+const bannerData = [
+  {
+    id: 'novos-clientes',
+    title: 'DESCUBRA POR QUE O EXTRAORDINÁRIO ACONTECE AQUI',
+    buttonText: 'Registre-se',
+    disclaimer: 'Jogue com responsabilidade. 18+.',
+    bgColor: 'from-bet-header to-primary-800',
+  },
+  {
+    id: 'sao-paulo-vs-santos',
+    title: 'PARA AMBOS OS TIMES MARCAREM',
+    subtitle: 'São Paulo vs Santos',
+    buttonText: 'Saiba mais',
+    disclaimer: 'Apenas para clientes novos e elegíveis.',
+    bgColor: 'from-primary-700 to-primary-800',
+  },
+  {
+    id: 'substituicoes',
+    title: 'JOGADOR SUBSTITUÍDO, APOSTA MANTIDA',
+    buttonText: 'Apostar agora',
+    disclaimer: 'Disponível para competições selecionadas.',
+    bgColor: 'from-primary-800 to-primary-900',
+  },
 ];
 
 export const SportsCategoriesSection = () => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* Barra de pesquisa */}
       <div className="relative">
-        <input
-          type="text"
-          placeholder="Pesquisar eventos, times ou competições..."
-          className="w-full py-3 pl-10 pr-4 border border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary dark:bg-gray-800 dark:text-white"
-        />
-        <svg
-          className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      </div>
-
-      {/* Banners em carrossel */}
-      <div className="relative rounded-lg overflow-hidden h-40 md:h-56">
-        {banners.map((banner, index) => (
-          <div 
-            key={banner.id} 
-            className={`absolute inset-0 ${banner.color} p-6 flex flex-col justify-between ${index === 0 ? 'opacity-100' : 'opacity-0'} transition-opacity duration-500`}
+        <div className="flex items-center w-full bg-background border border-bet-border rounded-sm overflow-hidden">
+          <svg
+            className="h-3 w-3 text-gray-400 ml-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
           >
-            <div>
-              <h2 className="text-2xl font-bold text-white">{banner.title}</h2>
-              <p className="text-white/80 mt-2">{banner.description}</p>
-            </div>
-            <button className="self-start bg-white text-primary font-semibold py-2 px-4 rounded-md hover:bg-gray-100 transition-colors">
-              Saiba Mais
-            </button>
-          </div>
-        ))}
-        
-        {/* Indicadores de slide */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-          {banners.map((banner, index) => (
-            <button 
-              key={banner.id} 
-              className={`h-2 w-2 rounded-full ${index === 0 ? 'bg-white' : 'bg-white/50'}`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Pesquisar"
+            className="w-full py-1.5 px-2 bg-background text-white border-none focus:outline-none text-xs"
+          />
         </div>
       </div>
 
-      {/* Categorias de esportes */}
-      <div>
-        <h2 className="text-lg font-semibold mb-4">Categorias Populares</h2>
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
-          {sportsCategories.map(sport => (
+      {/* Banners promocionais */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-1">
+        {bannerData.map((banner) => (
+          <div 
+            key={banner.id} 
+            className={`bg-gradient-to-r ${banner.bgColor} p-2 rounded-sm flex flex-col justify-between h-20 min-h-0`}
+          >
+            <div>
+              <h2 className="text-[11px] font-bold text-white leading-tight">{banner.title}</h2>
+              {banner.subtitle && (
+                <p className="text-white/90 text-[10px] mt-0.5">{banner.subtitle}</p>
+              )}
+            </div>
+            <div className="space-y-0.5">
+              <button className="bg-secondary text-black font-medium py-0.5 px-2 rounded-sm text-[10px] hover:bg-secondary-600 transition-colors min-h-0 h-5">
+                {banner.buttonText}
+              </button>
+              <p className="text-white/70 text-[9px] leading-tight">{banner.disclaimer}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Categorias de esportes com ícones */}
+      <div className="mt-1">
+        <div className="grid grid-cols-6 md:grid-cols-12 gap-0.5">
+          {sportsIcons.map(sport => (
             <Link 
               key={sport.id} 
               href={`/sports/${sport.id}`}
-              className="flex flex-col items-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow"
+              className="flex flex-col items-center py-0.5 px-0.5 hover:bg-background-lighter rounded transition-colors min-h-0"
             >
-              <span className="text-3xl mb-2">{sport.icon}</span>
-              <span className="text-sm font-medium text-gray-900 dark:text-white">{sport.name}</span>
+              <div className="w-4 h-4 rounded-full flex items-center justify-center bg-background mb-0.5">
+                <span className="text-[11px]">{sport.icon}</span>
+              </div>
+              <span className="text-[9px] text-gray-300 text-center whitespace-nowrap overflow-hidden text-ellipsis w-full leading-tight">{sport.name}</span>
             </Link>
           ))}
         </div>
