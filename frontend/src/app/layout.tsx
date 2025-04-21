@@ -21,8 +21,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
-      <body className={`${inter.variable} ${inter.className} antialiased`}>
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body className={`${inter.variable} font-sans bg-background text-white antialiased`}>
         <AuthProvider>
           <div className="min-h-screen flex flex-col">
             <Header />
@@ -32,10 +32,10 @@ export default function RootLayout({
                 {children}
               </main>
             </div>
-            <footer className="py-4 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
+            <footer className="py-2 border-t border-bet-border bg-background-dark text-gray-500 text-xs">
               <div className="max-w-7xl mx-auto px-4">
-                <p className="text-center text-sm text-gray-500">
-                  &copy; {new Date().getFullYear()} Bet Hub. Todos os direitos reservados.
+                <p className="text-center">
+                  &copy; {new Date().getFullYear()} Bet Hub. Apostas seguras e responsáveis.
                 </p>
               </div>
             </footer>

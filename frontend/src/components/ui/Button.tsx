@@ -11,7 +11,7 @@ const buttonVariants = cva(
       variant: {
         default: "bg-primary text-white hover:bg-primary-600 focus-visible:ring-primary",
         outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary: "bg-secondary text-white hover:bg-secondary-600 focus-visible:ring-secondary",
+        secondary: "bg-secondary text-black hover:bg-secondary-600 focus-visible:ring-secondary",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "underline-offset-4 hover:underline text-primary",
       },
@@ -31,16 +31,31 @@ const buttonVariants = cva(
 
 export interface ButtonProps
   extends ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {}
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
+}
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, children, ...props }, ref) => {
+    // Instead of using the Slot component, we'll handle it manually
+    if (asChild && React.isValidElement(children)) {
+      const childProps = {
+        ...props,
+        className: cn(buttonVariants({ variant, size }), className),
+        ref,
+      };
+
+      return React.cloneElement(children, childProps);
+    }
+
     return (
       <button
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         {...props}
-      />
+      >
+        {children}
+      </button>
     );
   }
 );

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Event } from '@/components/EventCard';
 
@@ -10,6 +10,17 @@ interface EventTableCardProps {
 }
 
 export const EventTableCard: React.FC<EventTableCardProps> = ({ events, title }) => {
+  const [extraNumbers, setExtraNumbers] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    const numbers = events.reduce((acc, event) => {
+      acc[event.id] = Math.floor(Math.random() * 30) + 10;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    setExtraNumbers(numbers);
+  }, [events]);
+  
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return {
@@ -19,53 +30,60 @@ export const EventTableCard: React.FC<EventTableCardProps> = ({ events, title })
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-md overflow-hidden shadow-sm border border-gray-200 dark:border-gray-800">
+    <div className="mb-4">
       {title && (
-        <div className="bg-gray-50 dark:bg-gray-800 px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="font-medium text-gray-800 dark:text-white">{title}</h3>
+        <div className="bg-bet-header px-2 py-1 text-white font-medium text-xs flex items-center rounded-t-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+          <span className="uppercase tracking-wide text-[11px]">{title}</span>
         </div>
       )}
       
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-            <tr>
-              <th className="px-4 py-2 text-left">Dia/Horário</th>
-              <th className="px-4 py-2 text-center">1</th>
-              <th className="px-4 py-2 text-center">X</th>
-              <th className="px-4 py-2 text-center">2</th>
+      <div className="bg-background-light rounded-b-sm">
+        <table className="w-full text-xs border-separate border-spacing-0">
+          <thead className="bg-background">
+            <tr className="text-gray-400 uppercase text-[10px]">
+              <th className="px-2 py-1 text-left">Data / Evento</th>
+              <th className="px-1 py-1 text-center w-12">1</th>
+              <th className="px-1 py-1 text-center w-12">X</th>
+              <th className="px-1 py-1 text-center w-12">2</th>
+              <th className="px-2 py-1 text-center w-10">+</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+          <tbody>
             {events.map((event) => {
               const { day, time } = formatDate(event.date);
               return (
-                <tr key={event.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-                  <td className="px-4 py-3">
+                <tr key={event.id} className="border-b border-bet-border">
+                  <td className="px-2 py-1">
                     <Link href={`/event/${event.id}`} className="block">
-                      <div className="text-gray-900 dark:text-white font-medium">{event.teams?.home || event.title}</div>
-                      <div className="flex items-center space-x-2">
-                        <div className="text-xs text-gray-500">{day} {time}</div>
-                        {event.teams?.away && (
-                          <div className="text-gray-900 dark:text-white font-medium">{event.teams.away}</div>
-                        )}
-                      </div>
+                      <div className="text-[10px] text-gray-400">{day} {time}</div>
+                      <div className="font-medium text-white text-xs leading-tight">{event.teams?.home || event.title}</div>
+                      {event.teams?.away && (
+                        <div className="font-medium text-white text-xs leading-tight">{event.teams.away}</div>
+                      )}
                     </Link>
                   </td>
-                  <td className="px-4 py-3">
-                    <button className="w-full rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 px-3 py-1.5 transition-colors text-center">
-                      {event.odds?.home.toFixed(2) || '-'}
-                    </button>
+                  <td className="px-1 py-1">
+                    <div className="bg-bet-odd hover:bg-bet-oddHover cursor-pointer text-center py-1 rounded-sm text-white text-xs font-semibold">
+                      {event.odds?.home.toFixed(2)}
+                    </div>
                   </td>
-                  <td className="px-4 py-3">
-                    <button className="w-full rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 px-3 py-1.5 transition-colors text-center">
+                  <td className="px-1 py-1">
+                    <div className="bg-bet-odd hover:bg-bet-oddHover cursor-pointer text-center py-1 rounded-sm text-white text-xs font-semibold">
                       {event.odds?.draw?.toFixed(2) || '-'}
-                    </button>
+                    </div>
                   </td>
-                  <td className="px-4 py-3">
-                    <button className="w-full rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 px-3 py-1.5 transition-colors text-center">
-                      {event.odds?.away.toFixed(2) || '-'}
-                    </button>
+                  <td className="px-1 py-1">
+                    <div className="bg-bet-odd hover:bg-bet-oddHover cursor-pointer text-center py-1 rounded-sm text-white text-xs font-semibold">
+                      {event.odds?.away.toFixed(2)}
+                    </div>
+                  </td>
+                  <td className="px-2 py-1 text-center">
+                    <Link href={`/event/${event.id}`} className="text-secondary hover:underline text-[10px]">
+                      +{extraNumbers[event.id] || ''}
+                    </Link>
                   </td>
                 </tr>
               );

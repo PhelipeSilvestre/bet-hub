@@ -31,6 +31,7 @@ export default function RegisterPage() {
     try {
       await register(email, username, password);
       router.push('/');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       setError(error.response?.data?.error || 'Ocorreu um erro ao criar a conta');
     } finally {
