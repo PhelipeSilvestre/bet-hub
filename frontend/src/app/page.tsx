@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { EventTableCard } from '@/components/EventTableCard';
 import { SportsCategoriesSection } from '@/components/SportsCategoriesSection';
-import { mockEvents } from '@/mocks/events';
+import { api } from '@/lib/api';
 import { Event } from '@/components/EventCard';
 
 // Agrupar eventos por esporte
@@ -20,13 +20,32 @@ const groupEventsBySport = (events: Event[]) => {
 export default function Home() {
   const [eventsBySport, setEventsBySport] = useState<Record<string, Event[]>>({});
   const [loading, setLoading] = useState(true);
-  
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-    // Simular a chamada de API
-    setEventsBySport(groupEventsBySport(mockEvents));
-    setLoading(false);
+    async function fetchEvents() {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await api.get('/sports/upcoming');
+        // Mapeia os dados da API para o formato esperado pelos componentes
+        const events = (response.data as any[]).map((event) => ({
+          ...event,
+          date: event.startTime,
+          teams: { home: event.homeTeam, away: event.awayTeam },
+          sport: event.sportName,
+        }));
+        setEventsBySport(groupEventsBySport(events));
+      } catch (err) {
+        setError('Erro ao carregar eventos.');
+        setEventsBySport({});
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchEvents();
   }, []);
-  
+
   if (loading) {
     return (
       <div className="p-4">
@@ -44,6 +63,12 @@ export default function Home() {
           </div>
         </div>
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 text-center text-red-500">{error}</div>
     );
   }
 
