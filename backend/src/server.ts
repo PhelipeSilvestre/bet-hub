@@ -1,6 +1,7 @@
 import express from 'express';
 import { env } from './config/env';
 import routes from './routes';
+import cors from 'cors';
 import sportsRoutes from './routes/sports.routes';
 import betRoutes from './routes/bet.routes';
 import authRoutes from './routes/auth.routes';
@@ -11,6 +12,12 @@ export const app = express();
 
 // Middleware para parsear o body da requisição
 app.use(express.json());
+
+// Configuração de CORS
+app.use(cors({
+  origin: 'http://localhost:3000', // ou '*' para liberar para qualquer origem (apenas para desenvolvimento)
+  credentials: true
+}));
 
 // Rotas
 app.use('/api', routes);
