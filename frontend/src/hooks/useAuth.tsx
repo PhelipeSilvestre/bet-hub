@@ -12,7 +12,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (email: string, username: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -47,8 +47,7 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactNode {
   const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      // In a real app, you'd make an API call here
-      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}/auth/login`;
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/auth/login`;
       
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -67,7 +66,7 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactNode {
       // Store user data
       const userData: User = {
         id: data.user.id,
-        name: data.user.name,
+        name: data.user.name || data.user.username,
         email: data.user.email,
       };
       
@@ -82,18 +81,17 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactNode {
     }
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (email: string, username: string, password: string) => {
     try {
       setIsLoading(true);
-      // In a real app, you'd make an API call here
-      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3005'}/auth/register`;
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/auth/register`;
       
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ email, username, password }),
       });
       
       if (!response.ok) {
