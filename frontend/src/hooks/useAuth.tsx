@@ -12,7 +12,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (username: string, email: string, password: string) => Promise<void>;
+  register: (email: string, username: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -81,7 +81,7 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactNode {
     }
   };
 
-  const register = async (username: string, email: string, password: string) => {
+  const register = async (email: string, username: string, password: string) => {
     try {
       setIsLoading(true);
       const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3002'}/api/auth/register`;
@@ -91,7 +91,7 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactNode {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({ email, username, password }),
       });
       
       if (!response.ok) {
